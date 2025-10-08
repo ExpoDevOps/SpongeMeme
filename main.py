@@ -30,31 +30,74 @@ def convert_text():
     input_text = input_box.get("1.0", tk.END).strip()
     if input_text:
         output = to_mocking_text(input_text)
-        output_box.config(state='normal')  # Enable editing to update text
+        output_box.config(state='normal')
         output_box.delete("1.0", tk.END)
         output_box.insert(tk.END, output)
-        output_box.config(state='disabled')  # Back to read-only
+        output_box.config(state='disabled')
+        feedback_label.config(text="")
+
+def copy_text():
+    """Copies the content of the output text box to the clipboard."""
+    output_text = output_box.get("1.0", tk.END).strip()
+    if output_text:
+        root.clipboard_clear()
+        root.clipboard_append(output_text)
+        feedback_label.config(text="Copied! 🧽")
+        root.after(2000, lambda: feedback_label.config(text=""))
+
+def clear_text():
+    """Clears the input and output text boxes and feedback label."""
+    input_box.delete("1.0", tk.END)
+    output_box.config(state='normal')
+    output_box.delete("1.0", tk.END)
+    output_box.config(state='disabled')
+    feedback_label.config(text="")
 
 # Set up the Tkinter window
 root = tk.Tk()
-root.title("SpongeBob Mocking Text Converter")
-root.geometry("400x300")
+root.title("🧽 SpongeMemeTextConverter")
+root.geometry("450x350")
+root.minsize(400, 300)
+root.configure(bg="#87CEEB")  # Sky blue for Bikini Bottom
+
+# Apply SpongeBob-themed styles
+style = ttk.Style()
+style.theme_use('clam')
+style.configure("TButton", font=("Comic Sans MS", 12, "bold"), padding=10, background="#FFD700")
+style.configure("TLabel", font=("Comic Sans MS", 14, "bold"), background="#87CEEB")
+style.map("TButton", background=[('active', '#32CD32')])  # Lime green on click
+
+# Main frame for centered content
+main_frame = ttk.Frame(root)
+main_frame.pack(padx=20, pady=20, fill="both", expand=True)
 
 # Input label and text box
-input_label = ttk.Label(root, text="Enter Text:")
-input_label.pack(pady=5)
-input_box = tk.Text(root, height=3, width=40)
-input_box.pack(pady=5)
+input_label = ttk.Label(main_frame, text="Enter Text:")
+input_label.pack(pady=(0, 5))
+input_box = tk.Text(main_frame, height=3, width=40, font=("Comic Sans MS", 12), wrap="word")
+input_box.pack(pady=(0, 10))
 
-# Convert button
-convert_button = ttk.Button(root, text="Convert", command=convert_text)
-convert_button.pack(pady=10)
+# Convert and Clear buttons side by side
+button_frame = ttk.Frame(main_frame)
+button_frame.pack(pady=10)
+convert_button = ttk.Button(button_frame, text="Convert", command=convert_text)
+convert_button.pack(side="left", padx=5)
+clear_button = ttk.Button(button_frame, text="Clear", command=clear_text)
+clear_button.pack(side="left", padx=5)
 
 # Output label and read-only text box
-output_label = ttk.Label(root, text="Mocking Text Output:")
-output_label.pack(pady=5)
-output_box = tk.Text(root, height=3, width=40, state='disabled')
-output_box.pack(pady=5)
+output_label = ttk.Label(main_frame, text="Text Output:")
+output_label.pack(pady=(10, 5))
+output_box = tk.Text(main_frame, height=3, width=40, font=("Comic Sans MS", 12), wrap="word", state='disabled')
+output_box.pack(pady=(0, 10))
+
+# Copy button
+copy_button = ttk.Button(main_frame, text="Copy", command=copy_text)
+copy_button.pack(pady=5)
+
+# Feedback label for copy confirmation
+feedback_label = ttk.Label(main_frame, text="", font=("Comic Sans MS", 10), foreground="#228B22")
+feedback_label.pack(pady=5)
 
 # Start the Tkinter event loop
 root.mainloop()
